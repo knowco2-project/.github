@@ -13,65 +13,135 @@
 <h1 align="center">knowco2</h1>
 
 <p align="center">
-  <strong>Know your air. Know your focus.</strong>
-</p>
-
-<p align="center">
   Open-source hardware and software for portable CO₂ monitoring and indoor air quality.
 </p>
 
----
-
-## Why CO₂?
-Indoor CO₂ is a strong proxy for ventilation effectiveness. When levels rise, it often means
-rebreathed air is accumulating in a space.
-
-Elevated indoor CO₂ is commonly associated with:
-- Reduced cognitive performance
-- Drowsiness and fatigue
-- Poor indoor air circulation
-
-**knowco2** exists to make this visible, understandable, and actionable.
+<p align="center">
+  <a href="https://github.com/knowco2-project/firmware-releases/releases"><img alt="Latest firmware release" src="https://img.shields.io/github/v/release/knowco2-project/firmware-releases?label=firmware&color=00d68f"></a>
+  <a href="https://knowco2.com"><img alt="Website" src="https://img.shields.io/badge/website-knowco2.com-00b4d8"></a>
+  <a href="https://cloud.knowco2.com"><img alt="Cloud portal" src="https://img.shields.io/badge/cloud-cloud.knowco2.com-1a1a2e"></a>
+</p>
 
 ---
 
-## What’s in this organization
-- **Firmware**  
-  ESP32-S3 firmware for CO₂, temperature, and humidity sensing
+## Overview
 
-- **Hardware**  
-  Enclosure designs, BOMs, wiring, and mechanical files
+knowco2 is an open-source CO₂ monitor built around low-cost, widely available microcontrollers and sensors. The firmware runs on CircuitPython and is designed to be readable, hackable, and straightforward to extend. The cloud backend, iOS app, and enclosure designs are all open alongside it.
 
-- **Apps & UI**  
-  Local device UI, dashboards, and future mobile experiments
+This organization is the central hub for firmware releases, hardware files, documentation, and support resources.
 
-- **Docs**  
-  Setup, calibration, and build guides
+---
 
-> **Optional cloud**  
-> Secure, low-cost cloud ingestion and history features are under active development.  
-> Some cloud components may remain private while security and cost controls are finalized.
+## Supported hardware
+
+**Microcontroller**
+- Adafruit Feather ESP32-S3 Reverse TFT *(primary)*
+- Other ESP32-S3 boards with adaptation
+
+**Power**
+- USB-C, 5 V 1 A
+- Works with any USB-C power source: wall adapters, power banks, laptop ports, and phones (using a USB-C to USB-C cable or male-to-male USB-C adapter)
+
+**Sensors**
+| Sensor | Measurement | Interface | Notes |
+|--------|-------------|-----------|-------|
+| Sensirion SCD4x (SCD40, SCD41) | CO₂, temperature, humidity | I²C | Primary |
+| Sensirion SCD30 | CO₂, temperature, humidity | I²C | Supported |
+
+Additional sensor support is intended to be straightforward to add. The firmware abstracts sensor reads behind a consistent interface.
+
+---
+
+## Repositories
+
+| Repository | Description |
+|------------|-------------|
+| [firmware-releases](https://github.com/knowco2-project/firmware-releases) | Versioned firmware releases and changelogs |
+| [.github](https://github.com/knowco2-project/.github) | Organization profile and shared configuration |
+
+> Private repositories (cloud infrastructure, iOS app, hardware CAD) may be made public as development stabilizes.
+
+**Coming soon**
+
+An MCP (Model Context Protocol) server is in development for cloud subscribers. It will expose your device data to AI tools — such as Claude, Cursor, or any MCP-compatible client — so you can query readings, trends, and alerts directly from the tools you already use.
+
+---
+
+## Firmware releases
+
+<!-- RELEASES_START -->
+See the [firmware-releases](https://github.com/knowco2-project/firmware-releases/releases) page for all releases, changelogs, and downloadable `.uf2` / `.py` assets.
+<!-- RELEASES_END -->
+
+---
+
+## Buttons
+
+| Button | Location | Short press | Hold (~2 s) |
+|--------|----------|-------------|-------------|
+| A | Bottom | Toggle °C / °F | — |
+| B | Middle | Cycle display mode (detailed → big CO₂ → graph) | — |
+| C | Top | Toggle between main screen and AP info screen | Switch between AP and STA (Wi-Fi client) mode |
+
+---
+
+## Quick reference
+
+**Device won't connect to Wi-Fi**
+- Check that your network is 2.4 GHz — 5 GHz is not supported
+- Hold the **top button (C) for ~2 seconds** to switch back into AP mode, then connect to the device's own Wi-Fi network and visit `http://192.168.4.1` to update credentials
+- Once connected to your network, the portal is accessible at `http://knowco2-XXXX.local` — replace `XXXX` with the four-character ID shown on the device's AP info screen
+
+**CO₂ readings seem wrong**
+- Allow ~60 seconds after power-on for the sensor to stabilize
+- **Automatic Self-Calibration (ASC)** is enabled by default and is the recommended long-term calibration method. The sensor tracks the lowest CO₂ level it sees over time and uses that as the fresh-air baseline (~400 ppm). For best results, expose the device to outdoor air for at least a few minutes periodically — this gives ASC a reliable reference point. First adjustments appear after ~2 days; the calibration settles within 7–9 days of normal use. See the [calibration guide](https://knowco2.com/calibration.html) for full details.
+- If readings are consistently off and you want to recalibrate immediately, use **Forced Recalibration (FRC)**: take the device outdoors, wait for it to stabilize, then trigger recalibration from the settings portal with a reference value of 400 ppm
+- Only disable ASC if the device is used in a continuously occupied or sealed space where CO₂ never drops to outdoor levels — in those environments ASC will drift low over time
+
+**Display not updating**
+- Press the middle button (B) to cycle through display modes
+- A watchdog reboot will occur automatically if the firmware hangs
+
+**Cloud not receiving data**
+- Confirm the device HMAC key matches what's registered in the cloud portal
+- Check that the device has a valid NTP time sync (required for HMAC signature validity)
+- Review the serial output at 115200 baud for error messages
+
+**Updating firmware or device files**
+
+> **Caution:** Modifying files directly on the device can prevent it from booting if done incorrectly. Only do this if you know what you're changing, and keep a backup of the original files.
+
+- **To update firmware over the local network** (recommended): with the device connected to your Wi-Fi, navigate to `http://knowco2-XXXX.local/update` in a browser. You can upload a firmware file directly from that page without connecting a USB cable.
+- **To update device files via USB** (e.g. `code.py`, config): hold the **middle button (B)** while powering on and keep holding it until the screen blinks. The `CIRCUITPY` drive will mount on your computer and you can edit files directly.
+- **To update CircuitPython itself**: double-tap the reset button quickly. The device enters the UF2 bootloader and mounts as `FTHRS3BOOT`. Drag a new `.uf2` file onto that drive to flash it.
+- If the device is unresponsive after a file change, re-enter drive mode as above and restore the previous `code.py` from a [firmware release](https://github.com/knowco2-project/firmware-releases/releases).
+
+---
+
+## Resources
+
+- **Getting started:** [knowco2.com/getting-started.html](https://knowco2.com/getting-started.html)
+- **Calibration guide:** [knowco2.com/calibration.html](https://knowco2.com/calibration.html)
+- **CO₂ explainer:** [knowco2.com/co2-interactive.html](https://knowco2.com/co2-interactive.html)
+- **Repair & self-service:** [knowco2.com/#repair](https://knowco2.com/#repair)
+- **Warranty:** [knowco2.com/warranty.html](https://knowco2.com/warranty.html)
+- **Contact:** [knowco2.com/contact.html](https://knowco2.com/contact.html)
+- **Cloud portal:** [cloud.knowco2.com](https://cloud.knowco2.com)
+- **Firmware releases & changelogs:** [firmware-releases/releases](https://github.com/knowco2-project/firmware-releases/releases)
+- **Issues & bug reports:** open an issue in the relevant repository
 
 ---
 
 ## Project principles
-- 🧠 **Accuracy over hype**
-- 🔐 **Privacy-first by design**
-- ⚡ **Low power, low operating cost**
-- 🛠 **Simple to build, simple to extend**
+
+- Accuracy over hype
+- Privacy-first by design
+- Low power, low operating cost
+- Simple to build, simple to extend
+- Fully open source
 
 ---
 
-## Get started
-1. Choose a repository below
-2. Follow the setup instructions
-3. Build, flash, or test
-4. Open an issue or pull request if you’d like to contribute
+## Contributing
 
-🌐 Website: https://knowco2.com
-
----
-
-## Status
-This project is under active development.  
-APIs, hardware designs, and firmware may evolve as the system matures.
+Issues, pull requests, and hardware experiments are welcome. If you're adapting the firmware for a different sensor or enclosure, opening an issue first is a good way to avoid duplicating work.

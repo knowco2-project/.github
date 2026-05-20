@@ -59,11 +59,44 @@ Additional sensor support is intended to be straightforward to add. The firmware
 | [firmware-releases](https://github.com/knowco2-project/firmware-releases) | Versioned firmware releases and changelogs |
 | [.github](https://github.com/knowco2-project/.github) | Organization profile and shared configuration |
 
-> Private repositories (cloud infrastructure, iOS app, hardware CAD) may be made public as development stabilizes.
+> Private repositories (cloud infrastructure, iOS app, Android app, hardware CAD) may be made public as development stabilizes.
 
-**Coming soon**
+---
 
-An MCP (Model Context Protocol) server is in development for cloud subscribers. It will expose your device data to AI tools — such as Claude, Cursor, or any MCP-compatible client — so you can query readings, trends, and alerts directly from the tools you already use.
+## Apps
+
+| Platform | Status |
+|----------|--------|
+| iOS (native Swift) | Available |
+| Android | In development |
+
+Both apps connect to the [knowco2 cloud](https://cloud.knowco2.com) for device management, historical data, and real-time readings.
+
+---
+
+## Integrations
+
+knowco2 is designed to fit into the tools and workflows you already use, without requiring a cloud account for local features.
+
+**Local network (no account required)**
+
+| Integration | How |
+|-------------|-----|
+| Home Assistant | MQTT — configure broker, port, credentials, and topic prefix in the settings portal |
+| Any MQTT broker (Mosquitto, Node-RED, etc.) | Same MQTT settings; topics publish on `<prefix>/co2`, `/temp_c`, `/humidity` |
+| Adafruit IO | Built-in Adafruit IO publishing to named feeds |
+| Grafana / InfluxDB | Poll the `/data` or `/status` JSON endpoints, or subscribe via MQTT |
+| Custom dashboards / scripts | HTTP JSON endpoints: `/status`, `/data`; CSV download at `/export.csv` |
+| OTA firmware updates | Browser-based update page at `/update` — no USB cable needed |
+
+**Cloud (account required)**
+
+| Integration | How |
+|-------------|-----|
+| knowco2 iOS app | Available now — device management, history, real-time readings |
+| knowco2 Android app | In development |
+| knowco2 cloud portal | [cloud.knowco2.com](https://cloud.knowco2.com) — web dashboard and device management |
+| AI tools (Claude, Cursor, and others) | MCP (Model Context Protocol) server in development — query readings, trends, and alerts directly from your AI tools |
 
 ---
 

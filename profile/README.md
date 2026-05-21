@@ -19,9 +19,9 @@
 <p align="center">
   <!-- OSHWA UID badge — add after certification is approved -->
   <!-- <a href="https://certification.oshwa.org/USXXXXXX.html"><img alt="OSHWA Certified" src="https://img.shields.io/badge/OSHWA-USXXXXXX-blue"></a> -->
-  <a href="LICENSE"><img alt="Docs license: CC-BY-SA-4.0" src="https://img.shields.io/badge/docs-CC--BY--SA--4.0-lightgrey"></a>
-  <a href="LICENSE-HARDWARE"><img alt="Hardware license: CERN-OHL-S-2.0" src="https://img.shields.io/badge/hardware-CERN--OHL--S--2.0-orange"></a>
-  <a href="firmware/LICENSE"><img alt="Firmware license: MIT" src="https://img.shields.io/badge/firmware-MIT-green"></a>
+  <a href="knowco2-hardware/LICENSE"><img alt="Docs license: CC-BY-SA-4.0" src="https://img.shields.io/badge/docs-CC--BY--SA--4.0-lightgrey"></a>
+  <a href="knowco2-hardware/LICENSE-HARDWARE"><img alt="Hardware license: CERN-OHL-S-2.0" src="https://img.shields.io/badge/hardware-CERN--OHL--S--2.0-orange"></a>
+  <a href="knowco2-firmware/LICENSE"><img alt="Firmware license: MIT" src="https://img.shields.io/badge/firmware-MIT-green"></a>
   <a href="https://github.com/knowco2-project/firmware-releases/releases"><img alt="Latest firmware release" src="https://img.shields.io/github/v/release/knowco2-project/firmware-releases?label=firmware&color=00d68f"></a>
   <a href="https://knowco2.com"><img alt="Website" src="https://img.shields.io/badge/website-knowco2.com-00b4d8"></a>
 </p>
@@ -42,29 +42,32 @@ This project is designed to comply with the [Open Source Hardware Definition v1.
 
 | Component | License |
 |-----------|---------|
-| Documentation | [CC-BY-SA-4.0](LICENSE) — Creative Commons Attribution-ShareAlike 4.0 |
-| Hardware design files | [CERN-OHL-S-2.0](LICENSE-HARDWARE) — CERN Open Hardware Licence Strongly Reciprocal v2 |
-| Firmware / software | [MIT](firmware/LICENSE) |
+| Documentation | [CC-BY-SA-4.0](knowco2-hardware/LICENSE) — Creative Commons Attribution-ShareAlike 4.0 |
+| Hardware design files | [CERN-OHL-S-2.0](knowco2-hardware/LICENSE-HARDWARE) — CERN Open Hardware Licence Strongly Reciprocal v2 |
+| Firmware / software | [MIT](knowco2-firmware/LICENSE) |
 
 <!-- Replace the placeholder below with your OSHWA UID after approval -->
 <!-- OSHWA Certification: [USXXXXXX](https://certification.oshwa.org/USXXXXXX.html) -->
 
 ---
 
-## Repository structure
+## Repositories
 
+| Repo | Visibility | Contents |
+|------|-----------|----------|
+| [knowco2-hardware](https://github.com/knowco2-project/knowco2-hardware) | Public | PCB files, enclosure, BOM, assembly docs |
+| [knowco2-firmware](https://github.com/knowco2-project/knowco2-firmware) | Public | CircuitPython firmware source |
+| [firmware-releases](https://github.com/knowco2-project/firmware-releases) | Public | Pre-built firmware releases and changelogs |
+| [.github](https://github.com/knowco2-project/.github) | Public | Org profile |
+
+**knowco2-hardware structure:**
 ```
-knowco2/
-├── README.md              — This file
+knowco2-hardware/
 ├── LICENSE                — CC-BY-SA-4.0 (documentation)
 ├── LICENSE-HARDWARE       — CERN-OHL-S-2.0 (hardware design files)
-├── hardware/
-│   ├── pcb/               — Schematic and PCB design files
-│   ├── enclosure/         — 3D enclosure design files
-│   └── bom/               — Bill of materials
-├── firmware/
-│   ├── LICENSE            — MIT (firmware)
-│   └── circuitpython/     — CircuitPython firmware source
+├── pcb/                   — Schematic and PCB design files
+├── enclosure/             — 3D enclosure design files (STEP, STL, 3MF)
+├── bom/                   — Bill of materials (bom.csv)
 └── docs/
     ├── assembly.md        — Assembly instructions
     └── calibration.md     — Sensor calibration guide
@@ -86,20 +89,64 @@ knowco2/
 
 | Sensor | Measurement | Interface | Notes |
 |--------|-------------|-----------|-------|
-| Sensirion SCD4x (SCD40, SCD41) | CO₂, temperature, humidity | I²C | Primary |
+| Sensirion SCD41 | CO₂, temperature, humidity | I²C (0x62) | Primary |
 | Sensirion SCD30 | CO₂, temperature, humidity | I²C | Supported |
 
-Full bill of materials: [hardware/bom/bom.csv](hardware/bom/bom.csv)
+Full bill of materials: [hardware/bom/bom.csv](knowco2-hardware/bom/bom.csv)
+
+---
+
+## Technical specifications
+
+**CO₂ measurement (Sensirion SCD41)**
+
+| Parameter | Value |
+|-----------|-------|
+| Range | 400–5000 ppm |
+| Accuracy | ±(40 ppm + 5% of reading) |
+| Interface | I²C at address 0x62 |
+
+**Temperature measurement (Sensirion SCD41)**
+
+| Parameter | Value |
+|-----------|-------|
+| Range | –10 to +60 °C |
+| Accuracy | ±0.8 °C (at 15–35 °C) |
+
+**Humidity measurement (Sensirion SCD41)**
+
+| Parameter | Value |
+|-----------|-------|
+| Range | 0–95% RH |
+| Accuracy | ±6% RH (at 15–35 °C, 20–65% RH) |
+
+**Operating conditions**
+
+| Parameter | Value |
+|-----------|-------|
+| Operating temperature | –10 to +60 °C (limited by SCD41) |
+| Power input | 5 V via USB-C |
+| Connectivity | 2.4 GHz Wi-Fi 802.11 b/g/n only (5 GHz not supported) |
+| Bluetooth | BLE 5.0 |
+
+**Microcontroller (Adafruit Feather ESP32-S3 Reverse TFT)**
+
+| Parameter | Value |
+|-----------|-------|
+| Processor | ESP32-S3 dual-core Xtensa LX7 @ 240 MHz |
+| Flash | 4 MB |
+| PSRAM | 2 MB |
+| Display | 1.14" IPS TFT, 240×135 px (ST7789) |
 
 ---
 
 ## Hardware files
 
-Design files are in [hardware/](hardware/). See [hardware/README.md](hardware/README.md) for format details and sourcing notes.
+Design files are in [hardware/](hardware/). See [hardware/README.md](knowco2-hardware/README.md) for format details and sourcing notes.
 
-- **PCB / schematic:** [hardware/pcb/](hardware/pcb/) — KiCad source files, Gerbers, PDF schematic
-- **Enclosure:** [hardware/enclosure/](hardware/enclosure/) — STEP, STL, and source files
-- **BOM:** [hardware/bom/bom.csv](hardware/bom/bom.csv)
+- **PCB / schematic:** [hardware/pcb/](knowco2-hardware/pcb/) — KiCad source files, Gerbers, PDF schematic
+- **Enclosure:** [hardware/enclosure/](knowco2-hardware/enclosure/) — STEP, STL, and source files
+- **BOM:** [hardware/bom/bom.csv](knowco2-hardware/bom/bom.csv)
 
 ---
 
@@ -117,7 +164,7 @@ Firmware source is in [firmware/circuitpython/](firmware/circuitpython/). Pre-bu
 
 ## Assembly
 
-Step-by-step assembly instructions: [docs/assembly.md](docs/assembly.md)
+Step-by-step assembly instructions: [docs/assembly.md](knowco2-hardware/docs/assembly.md)
 
 **Required tools**
 - Soldering iron (optional — if using headers)
@@ -173,7 +220,7 @@ Step-by-step assembly instructions: [docs/assembly.md](docs/assembly.md)
 
 **CO₂ readings seem wrong**
 - Allow ~60 seconds after power-on for the sensor to stabilize
-- Automatic Self-Calibration (ASC) is enabled by default. The sensor tracks the lowest CO₂ level over time and uses that as the fresh-air baseline (~400 ppm). First adjustments appear after ~2 days; calibration settles within 7–9 days. See [docs/calibration.md](docs/calibration.md) for full details.
+- Automatic Self-Calibration (ASC) is enabled by default. The sensor tracks the lowest CO₂ level over time and uses that as the fresh-air baseline (~400 ppm). First adjustments appear after ~2 days; calibration settles within 7–9 days. See [docs/calibration.md](knowco2-hardware/docs/calibration.md) for full details.
 - For immediate recalibration, take the device outdoors, wait for it to stabilize, then trigger Forced Recalibration (FRC) from the settings portal with a reference of 400 ppm.
 
 **Display not updating**
@@ -185,7 +232,7 @@ Step-by-step assembly instructions: [docs/assembly.md](docs/assembly.md)
 ## Resources
 
 - **Getting started:** [knowco2.com/getting-started.html](https://knowco2.com/getting-started.html)
-- **Calibration guide:** [docs/calibration.md](docs/calibration.md) · [knowco2.com/calibration.html](https://knowco2.com/calibration.html)
+- **Calibration guide:** [docs/calibration.md](knowco2-hardware/docs/calibration.md) · [knowco2.com/calibration.html](https://knowco2.com/calibration.html)
 - **CO₂ explainer:** [knowco2.com/co2-interactive.html](https://knowco2.com/co2-interactive.html)
 - **Firmware releases:** [firmware-releases/releases](https://github.com/knowco2-project/firmware-releases/releases)
 - **Issues & bug reports:** [open an issue](https://github.com/knowco2-project/knowco2/issues)
@@ -213,8 +260,8 @@ Issues, pull requests, and hardware experiments are welcome. If you're adapting 
 
 | What | License | File |
 |------|---------|------|
-| Documentation, guides, this README | CC-BY-SA-4.0 | [LICENSE](LICENSE) |
-| Hardware design files (PCB, enclosure, BOM) | CERN-OHL-S-2.0 | [LICENSE-HARDWARE](LICENSE-HARDWARE) |
-| Firmware and software | MIT | [firmware/LICENSE](firmware/LICENSE) |
+| Documentation, guides, this README | CC-BY-SA-4.0 | [LICENSE](knowco2-hardware/LICENSE) |
+| Hardware design files (PCB, enclosure, BOM) | CERN-OHL-S-2.0 | [LICENSE-HARDWARE](knowco2-hardware/LICENSE-HARDWARE) |
+| Firmware and software | MIT | [firmware/LICENSE](knowco2-firmware/LICENSE) |
 
 All licenses are [OSHWA-approved](https://www.oshwa.org/sharing-best-practices/made-with-creative-commons/) for open source hardware projects.

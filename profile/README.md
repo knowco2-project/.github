@@ -56,7 +56,6 @@ This project is designed to comply with the [Open Source Hardware Definition v1.
 | Repo | Visibility | Contents |
 |------|-----------|----------|
 | [knowco2-hardware](https://github.com/knowco2-project/knowco2-hardware) | Public | PCB files, enclosure, BOM, assembly docs |
-| [knowco2-firmware](https://github.com/knowco2-project/knowco2-firmware) | Public | CircuitPython firmware source |
 | [firmware-releases](https://github.com/knowco2-project/firmware-releases) | Public | Pre-built firmware releases and changelogs |
 | [.github](https://github.com/knowco2-project/.github) | Public | Org profile |
 
